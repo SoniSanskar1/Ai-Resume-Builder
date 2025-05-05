@@ -11,9 +11,15 @@ public class ResumeRequest {
     private String fullName;
     private String email;
     private String phone;
+    private String contactEmail;
+    private String contactPhone;
+    private String address;
     private String title;
     private String summary;
+    private List<String> skills;
+    private List<String> hobbies;
+    private List<String> additionalSkills;
     private List<Education> educationList;
     private List<Experience> experienceList;
-    private List<String> skills;
+    private boolean fresher;
 }

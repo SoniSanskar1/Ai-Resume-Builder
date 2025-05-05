@@ -1,21 +1,10 @@
 import React from 'react';
-import { CircularProgress, Typography, Box } from '@mui/material';
+import { CircularProgress, Box } from '@mui/material';
 
-const Loader = () => {
+const Loader = ({ size = 40 }) => {
   return (
-    <Box
-      sx={{
-        minHeight: '80vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <CircularProgress size={70} thickness={4} />
-      <Typography variant="h6" mt={3}>
-        Analyzing your resume with AI...
-      </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <CircularProgress size={size} />
     </Box>
   );
 };

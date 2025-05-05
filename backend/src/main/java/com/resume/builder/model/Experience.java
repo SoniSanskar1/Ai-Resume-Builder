@@ -1,7 +1,5 @@
 package com.resume.builder.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,8 +14,9 @@ public class Experience {
     private String position;
     private String duration;
 
+    private boolean fresher = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
-    @JsonBackReference // 👈 Add this
     private Resume resume;
 }

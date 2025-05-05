@@ -1,40 +1,32 @@
-// Sidebar.js
-import React from 'react';
-import { Drawer, List, ListItem, ListItemText } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Drawer, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-  const options = [
-    { text: 'Dashboard', path: '/' },
-    { text: 'Create Resume', path: '/create-resume' },
-    { text: 'My Resumes', path: '/resumes' },
-    { text: 'AI Chat', path: '/ai-chat' },
-    { text: 'Logout', path: '/logout' },
-  ];
+  const [open, setOpen] = useState(false);
+
+  const toggleDrawer = () => setOpen(!open);
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: 240,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: 240,
-          boxSizing: 'border-box',
-          backgroundColor: '#f0f0f0',
-          paddingTop: '64px', // to account for AppBar if any
-        },
-      }}
-    >
-      <List>
-        {options.map((opt) => (
-          <ListItem button key={opt.text} onClick={() => navigate(opt.path)}>
-            <ListItemText primary={opt.text} />
+    <div>
+      <IconButton onClick={toggleDrawer}>
+        <MenuIcon />
+      </IconButton>
+      <Drawer open={open} onClose={toggleDrawer}>
+        <List>
+          <ListItem button component={Link} to="/dashboard">
+            <ListItemText primary="Dashboard" />
           </ListItem>
-        ))}
-      </List>
-    </Drawer>
+          <ListItem button component={Link} to="/create-resume">
+            <ListItemText primary="Create Resume" />
+          </ListItem>
+          <ListItem button component={Link} to="/ai-chat">
+            <ListItemText primary="AI Chat" />
+          </ListItem>
+        </List>
+      </Drawer>
+    </div>
   );
 };
 

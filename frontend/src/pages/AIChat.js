@@ -1,54 +1,57 @@
-import React, { useState } from 'react';
-import { Box, TextField, IconButton, Typography } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import ChatMessage from '../components/ChatMessage';
-import Sidebar from '../components/Sidebar';
-import { askMistral } from '../api/mistral';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, TextField, Button, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { createChatMessage } from '../services/api'; // Assuming you have a function to send chat messages to the backend
 
-const AIChat = () => {
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi! I am your resume assistant. Ask me anything!' }
-  ]);
+const AiChat = () => {
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    // You could load previous chat messages here if needed
+  }, []);
 
-    const newMessages = [...messages, { role: 'user', content: input }];
-    setMessages(newMessages);
-    setInput('');
+  const handleSendMessage = async () => {
+    if (input.trim() === '') return;
 
-    const response = await askMistral(newMessages);
-    setMessages([...newMessages, response]);
+    // Add user's message to chat
+    const newMessage = { text: input, sender: 'user' };
+    setMessages((prev) => [...prev, newMessage]);
+
+    // Send message to AI backend (you should define this in api.js)
+    try {
+      const response = await createChatMessage(input);
+      const aiMessage = { text: response.data.message, sender: 'ai' };
+      setMessages((prev) => [...prev, aiMessage]);
+      setInput(''); // Clear input field
+    } catch (error) {
+      console.error('Error sending message', error);
+    }
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar />
-      <Box sx={{ ml: '240px', p: 3, flexGrow: 1 }}>
-        <Typography variant="h5" gutterBottom>
-          AI Resume Chat
-        </Typography>
-        <Box sx={{ height: '65vh', overflowY: 'auto', mb: 2 }}>
-          {messages.map((msg, i) => (
-            <ChatMessage key={i} {...msg} />
-          ))}
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <TextField
-            fullWidth
-            placeholder="Ask something..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          />
-          <IconButton onClick={handleSend}>
-            <SendIcon />
-          </IconButton>
-        </Box>
+    <Box sx={{ width: '100%', maxWidth: 400, bgcolor: 'background.paper' }}>
+      <Typography variant="h5" sx={{ marginBottom: 2 }}>AI Chat</Typography>
+      <List sx={{ maxHeight: 400, overflowY: 'auto' }}>
+        {messages.map((msg, index) => (
+          <ListItem key={index}>
+            <ListItemText primary={msg.text} secondary={msg.sender === 'user' ? 'You' : 'AI'} />
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Type a message"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          sx={{ marginRight: 2 }}
+        />
+        <Button variant="contained" onClick={handleSendMessage}>Send</Button>
       </Box>
     </Box>
   );
 };
 
-export default AIChat;
+export default AiChat;

@@ -1,4 +1,5 @@
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\service\CustomUserDetailsService.java
+D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\repository\ExperienceRepository.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\dto\NotBlank.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\AiResumeBuilderApplication.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\filter\JwtAuthenticationFilter.java
@@ -15,6 +16,7 @@ D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\util\JwtUt
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\model\Resume.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\controller\UserController.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\config\WebConfig.java
+D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\repository\EducationRepository.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\service\impl\ResumeServiceImpl.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\repository\ResumeRepository.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\service\ResumeService.java
