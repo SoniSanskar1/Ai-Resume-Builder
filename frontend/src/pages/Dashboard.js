@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 const Dashboard = () => {
   const [resumeCreated, setResumeCreated] = useState(false);
   const navigate = useNavigate();
@@ -35,7 +36,15 @@ const Dashboard = () => {
           </Button>
         </Stack>
       ) : (
-        <Typography variant="body1">Welcome back! Use the menu to start creating or editing your resume.</Typography>
+        <Box>
+      <Navbar />
+      <Box sx={{ display: "flex" }}>
+        <Sidebar />
+        <Box sx={{ flexGrow: 1, p: 3 }}>
+          <Typography variant="h4">Welcome to Dashboard</Typography>
+        </Box>
+      </Box>
+    </Box>
       )}
     </Box>
   );
