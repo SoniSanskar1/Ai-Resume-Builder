@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography, IconButton, Stack, Switch, FormControlLabel, Divider, CircularProgress, Snackbar } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { createResume } from '../services/api';
+// import { askMistral } from '../api/mistral';
 
 const CreateResume = () => {
   const [resume, setResume] = useState({
@@ -116,6 +117,7 @@ const CreateResume = () => {
       setLoading(false); // End loading state
     }
   };
+  
 
   return (
     <>
