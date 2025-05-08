@@ -6,21 +6,38 @@ import { createResume } from '../services/api';
 
 const CreateResume = () => {
   const [resume, setResume] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    title: '',
-    summary: '',
-    skills: '',
-    hobbies: '',
-    additionalSkills: '',
-    address: '',
-    contactEmail: '',
-    contactPhone: '',
-    educationList: [{ school: '', degree: '', field: '', startDate: '', endDate: '' }],
-    experienceList: [{ company: '', position: '', startDate: '', endDate: '', description: '' }],
+    fullName: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '1234567890',
+    title: 'Software Engineer',
+    summary: 'Experienced software engineer with a passion for developing innovative programs.',
+    skills: 'JavaScript, React, Node.js',
+    hobbies: 'Reading, Hiking',
+    additionalSkills: 'TypeScript, GraphQL',
+    address: '123 Main St, Bengaluru, Karnataka',
+    contactEmail: 'john.doe@example.com',
+    contactPhone: '1234567890',
+    educationList: [
+      {
+        school: 'ABC University',
+        degree: 'B.Tech',
+        field: 'Computer Science',
+        startDate: '2015-08-01',
+        endDate: '2019-05-31',
+      },
+    ],
+    experienceList: [
+      {
+        company: 'XYZ Corp',
+        position: 'Frontend Developer',
+        startDate: '2019-06-01',
+        endDate: '2021-08-31',
+        description: 'Developed and maintained web applications using React.',
+      },
+    ],
     isFresher: false,
   });
+  
 
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -82,7 +99,11 @@ const CreateResume = () => {
     e.preventDefault();
     setLoading(true); // Start loading state
     try {
-      await createResume(resume);
+      const clonedResume = structuredClone(resume);
+      clonedResume.skills = clonedResume.skills.split(",");
+      clonedResume.hobbies = clonedResume.hobbies.split(",");
+      clonedResume.additionalSkills = clonedResume.additionalSkills.split(",");
+      await createResume(clonedResume);
       setSnackbarSeverity('success');
       setSnackbarMessage('Resume created successfully!');
       setSnackbarOpen(true);

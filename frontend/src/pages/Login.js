@@ -13,7 +13,8 @@ function Login() {
     try {
       const token = await loginUser({ email, password }); // ✅ Get JWT token
       if (token) {
-        localStorage.setItem("token", token); // ✅ Store JWT token
+        debugger;
+        localStorage.setItem("token", token.data.token); // ✅ Store JWT token
         alert("Login Successful!");
         navigate("/dashboard"); // ✅ Redirect to dashboard after login
       }

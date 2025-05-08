@@ -20,6 +20,7 @@ public class JwtUtil {
     private static final long JWT_EXPIRATION_MS = 1000 * 60 * 60; // 1 hour
 
     public String generateToken(String email) {
+        System.out.println("Generate token: " + email);
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
@@ -52,7 +53,12 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
+        System.out.println("Validate token: " + token);
+        System.out.println("User details: " + userDetails.getUsername());
+        System.out.println("isTokenExpired(token): " + isTokenExpired(token));
+
         final String email = extractEmail(token);
+        System.out.println("Email: " + email);
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 

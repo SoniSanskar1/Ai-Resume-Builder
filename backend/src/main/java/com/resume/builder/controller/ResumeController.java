@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/resume")
-@CrossOrigin(origins = "http://localhost:3000") // Update if frontend runs elsewhere
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true") // Update if frontend runs elsewhere
 public class ResumeController {
 
     @Autowired
@@ -19,6 +19,7 @@ public class ResumeController {
     // POST: Create a new resume
     @PostMapping
     public ResponseEntity<Resume> createResume(@RequestBody ResumeRequest resumeRequest, Authentication authentication) {
+        System.out.println("inside create  resume");
         String username = authentication.getName();
         Resume createdResume = resumeService.createResume(username, resumeRequest);
         return ResponseEntity.ok(createdResume);

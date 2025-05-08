@@ -15,7 +15,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000")  // ✅ Your React frontend
-                        .allowedMethods("*")                     // ✅ Allow all REST methods
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")                 // ✅ Allow all REST methods
                         .allowedHeaders("*")                     // ✅ Accept all headers
                         .allowCredentials(true)                  // ✅ Required for cookies/auth headers
                         .exposedHeaders("Authorization");        // ✅ (Optional) Expose token headers if needed

@@ -41,7 +41,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/refresh-token").permitAll()
-                .requestMatchers("/api/resumes/**").hasRole("USER")  // ✅ Required access added
+                .requestMatchers("/api/resume/**").authenticated()//.hasRole("USER")  // ✅ Required access added
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
