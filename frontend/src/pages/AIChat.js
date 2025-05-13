@@ -8,17 +8,81 @@ import {
   ListItemText,
   TextField,
   IconButton,
-  Divider,
   Typography,
   Button,
   AppBar,
   Toolbar,
   Paper,
 } from "@mui/material";
-import { Delete, Edit, Save } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { askMistral } from "../api/mistral";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import Loader from "../components/Loader";
+import ModernResume from "../components/ModernResume";
 
 const drawerWidth = 260;
+
+const generateEnhancementPrompt = (data) => {
+  const educationFormatted = data.educationList
+    .map(e => `- ${e.degree} in ${e.field}, ${e.school} (${e.startDate} – ${e.endDate})`)
+    .join('\n');
+
+  const experienceFormatted = data.isFresher
+    ? "- Fresher"
+    : data.experienceList
+      .map(e => `- ${e.position} at ${e.company} (${e.startDate} – ${e.endDate}): ${e.description}`)
+      .join('\n');
+
+  return `Enhance the following resume details to make it more professional, ATS-optimized, and structured.
+  
+Important:
+- DO NOT mentions the skills in summary part make it more proffesional about me section for resume
+- DO NOT modify or embellish personal details like name, title, email, phone, or address.
+- DO NOT generate skills or technologies inside the summary.
+- DO NOT fabricate experience. If isFresher is true, add only one experience entry with:
+  position: "Fresher"
+  company: ""
+  startDate: ""
+  endDate: ""
+  description: A general objective statement like: "Recent graduate seeking opportunities to apply academic knowledge in a real-world environment and grow as a software developer."
+- Keep summary focused, clean, and ATS-friendly.
+- Return ONLY a valid JSON object with the following fields:
+
+{
+  fullName: string,
+  title: string,
+  email: string,
+  phone: string,
+  address: string,
+  summary: string,
+  skills: array of strings,
+  additionalSkills: array of strings,
+  hobbies: array of strings,
+  educationList: array of { degree, school, startDate, endDate },
+  experienceList: array of { position, company, startDate, endDate, description }
+}
+
+User Resume:
+Full Name: ${data.fullName}
+Title: ${data.title}
+Email: ${data.email}
+Phone: ${data.phone}
+Address: ${data.address}
+Summary: ${data.summary}
+Skills: ${data.skills}
+Additional Skills: ${data.additionalSkills}
+Hobbies: ${data.hobbies}
+
+Education:
+${educationFormatted}
+
+Experience:
+${experienceFormatted}
+
+Return only the enhanced JSON version.`;
+};
+
 
 const AiChatWithSidebar = () => {
   const [chats, setChats] = useState([]);
@@ -26,16 +90,61 @@ const AiChatWithSidebar = () => {
   const [input, setInput] = useState("");
   const [editingChatId, setEditingChatId] = useState(null);
   const [chatNames, setChatNames] = useState({});
+  const [resumeText, setResumeText] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!currentChatId) startNewChat();
   }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("resumeAiMessage");
+    if (stored && currentChatId) {
+      const parsed = JSON.parse(stored);
+      const formattedPrompt = generateEnhancementPrompt(parsed);
+
+      const autoSend = async () => {
+        const userMsg = { sender: "user", text: formattedPrompt };
+        const updatedChats = chats.map((chat) =>
+          chat.id === currentChatId
+            ? { ...chat, messages: [...chat.messages, userMsg] }
+            : chat
+        );
+        setChats(updatedChats);
+
+        setLoading(true);
+        const aiResponse = await askMistral([{ role: "user", content: formattedPrompt }]);
+        setLoading(false);
+        const aiText = aiResponse.content;
+
+        const aiMsg = { sender: "ai", text: aiText };
+        const finalChats = updatedChats.map((chat) =>
+          chat.id === currentChatId
+            ? { ...chat, messages: [...chat.messages, aiMsg] }
+            : chat
+        );
+        setChats(finalChats);
+        setChatNames((prev) => ({ ...prev, [currentChatId]: "Resume Enhancement" }));
+
+        try {
+          const json = JSON.parse(aiText);
+          setResumeText(json);
+        } catch {
+          setResumeText(null);
+        }
+      };
+
+      autoSend();
+      localStorage.removeItem("resumeAiMessage");
+    }
+  }, [currentChatId, chats]);
 
   const startNewChat = () => {
     const id = Date.now().toString();
     setChats((prev) => [...prev, { id, messages: [] }]);
     setCurrentChatId(id);
     setChatNames((prev) => ({ ...prev, [id]: "New Chat" }));
+    setResumeText(null);
   };
 
   const handleSendMessage = async () => {
@@ -49,25 +158,30 @@ const AiChatWithSidebar = () => {
     );
     setChats(updatedChats);
     setInput("");
+    setLoading(true);
 
-    const aiResponse = await askMistral([
-      { role: "user", content: input },
-    ]);
+    const aiResponse = await askMistral([{ role: "user", content: input }]);
+    setLoading(false);
+    const aiText = aiResponse.content;
 
-    const aiMsg = { sender: "ai", text: aiResponse.content };
-
+    const aiMsg = { sender: "ai", text: aiText };
     const finalChats = updatedChats.map((chat) =>
       chat.id === currentChatId
         ? { ...chat, messages: [...chat.messages, aiMsg] }
         : chat
     );
-
     setChats(finalChats);
 
-    // Auto rename
     if (chatNames[currentChatId] === "New Chat") {
       const suggested = input.split(" ").slice(0, 4).join(" ");
       setChatNames((prev) => ({ ...prev, [currentChatId]: suggested }));
+    }
+
+    try {
+      const json = JSON.parse(aiText);
+      setResumeText(json);
+    } catch {
+      setResumeText(null);
     }
   };
 
@@ -85,6 +199,25 @@ const AiChatWithSidebar = () => {
   };
 
   const currentMessages = chats.find((c) => c.id === currentChatId)?.messages || [];
+  const handleDownload = async () => {
+    const canvas = await html2canvas(document.getElementById("resume-template"));
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, width, height);
+    pdf.save("Sanskar_SDE_Resume.pdf");
+
+    // ✅ Save to localStorage for Dashboard Recent Activity
+    localStorage.setItem(
+      "recentActivity",
+      JSON.stringify({
+        fileName: "Sanskar_SDE_Resume.pdf",
+        timestamp: new Date().toISOString(),
+      })
+    );
+  };
+
 
   return (
     <Box sx={{ display: "flex", bgcolor: "#121212", height: "100vh", color: "#fff" }}>
@@ -120,7 +253,10 @@ const AiChatWithSidebar = () => {
                 ) : (
                   <ListItemText
                     primary={chatNames[chat.id]}
-                    onClick={() => setCurrentChatId(chat.id)}
+                    onClick={() => {
+                      setCurrentChatId(chat.id);
+                      setResumeText(null);
+                    }}
                     sx={{ cursor: "pointer" }}
                   />
                 )}
@@ -152,17 +288,42 @@ const AiChatWithSidebar = () => {
                 my: 1,
                 bgcolor: msg.sender === "user" ? "#3a3a3a" : "#2e7d32",
                 color: "#fff",
+                whiteSpace: "pre-line",
               }}
             >
               <Typography variant="body2" fontWeight="bold">
                 {msg.sender === "user" ? "You" : "AI"}
               </Typography>
-              <Typography>{msg.text}</Typography>
+              <Typography sx={{ whiteSpace: "pre-line" }}>{msg.text}</Typography>
             </Paper>
           ))}
+          {loading && <Loader />}
         </Box>
 
-        <Box sx={{ display: "flex", gap: 1 }}>
+        {resumeText && (
+          <Box
+            sx={{
+              backgroundColor: "#fff",
+              color: "#000",
+              borderRadius: 2,
+              padding: 3,
+              mt: 2,
+              boxShadow: 3,
+            }}
+          >
+            <ModernResume data={resumeText} />
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <Button variant="contained" onClick={handleDownload}>
+                Download PDF
+              </Button>
+              <Button variant="outlined" onClick={() => setResumeText(null)}>
+                Clear Resume
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
           <TextField
             variant="outlined"
             fullWidth

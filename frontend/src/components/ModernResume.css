@@ -1,0 +1,95 @@
+/* ModernResume.css */
+
+.modern-resume.upgraded {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f4f4;
+  color: #333;
+  padding: 20px;
+  width: 800px;
+  margin: 20px auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 8px;
+}
+
+.resume-header {
+  background: #2e86de;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 6px 6px 0 0;
+}
+.resume-header h1 {
+  margin: 0;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+.resume-header h2 {
+  margin: 4px 0 10px;
+  font-weight: normal;
+  font-size: 18px;
+  font-style: italic;
+}
+.resume-header p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.resume-body {
+  display: flex;
+  gap: 20px;
+  padding: 20px 10px;
+  background: white;
+  border-radius: 0 0 6px 6px;
+}
+
+.left-column {
+  width: 30%;
+  background: #ecf0f1;
+  padding: 15px;
+  border-radius: 6px;
+}
+.left-column section {
+  margin-bottom: 20px;
+}
+.left-column h3 {
+  border-bottom: 1px solid #bbb;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+.left-column ul {
+  list-style: disc;
+  padding-left: 20px;
+}
+
+.right-column {
+  width: 70%;
+}
+.right-column section {
+  margin-bottom: 24px;
+}
+.right-column h3 {
+  color: #2e86de;
+  font-size: 18px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+}
+.right-column .entry {
+  margin-bottom: 12px;
+}
+.right-column .entry strong {
+  font-weight: bold;
+  font-size: 15px;
+}
+.right-column .entry span,
+.right-column .entry small {
+  display: block;
+  color: #555;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.right-column .entry p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}

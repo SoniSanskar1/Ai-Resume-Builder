@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,15 +31,20 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String loginUser(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
+    public Map<String, String> loginUser(String email, String password) {
+    Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (passwordEncoder.matches(password, user.getPassword())) {
-                return jwtUtil.generateToken(email);
-            }
+    if (userOptional.isPresent()) {
+        User user = userOptional.get();
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            String token = jwtUtil.generateToken(email);
+            return Map.of(
+                "token", token,
+                "name", user.getName(),
+                "email", user.getEmail()
+            );
         }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
+    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+}
 }

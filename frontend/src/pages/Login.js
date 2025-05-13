@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/api"; // ✅ API call function
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../services/api";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,12 +10,18 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const token = await loginUser({ email, password }); // ✅ Get JWT token
-      if (token) {
-        debugger;
-        localStorage.setItem("token", token.data.token); // ✅ Store JWT token
+      const response = await loginUser({ email, password });
+      console.log("Login API Response:", response);
+
+      if (response?.data?.token) {
+        const { token, name } = response.data;
+
+        // Store token and user details
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify({ name, email }));
+
         alert("Login Successful!");
-        navigate("/dashboard"); // ✅ Redirect to dashboard after login
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Login Error:", error);
