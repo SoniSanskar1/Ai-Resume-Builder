@@ -1,17 +1,17 @@
 services:
   - type: web
     name: resume-backend
-    env: java
+    runtime: java
     plan: free
+    rootDir: backend
     buildCommand: ./mvnw clean install
     startCommand: java -jar target/*.jar
-    rootDir: backend
     envVars:
       - key: DB_URL
-        value: jdbc:postgresql://your-db-host
+        value: jdbc:postgresql://localhost:5432/resume_builder
       - key: DB_USER
-        value: youruser
+        value: postgres
       - key: DB_PASS
-        value: yourpass
+        value: soniSQL@123
       - key: API_KEY
         value: MlQpO64ZF27xYuS5cs0YL4qbOfGubnlL
