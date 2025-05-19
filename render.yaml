@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: resume-backend
+    env: java
+    plan: free
+    buildCommand: ./mvnw clean install
+    startCommand: java -jar target/*.jar
+    rootDir: backend
+    envVars:
+      - key: DB_URL
+        value: jdbc:postgresql://your-db-host
+      - key: DB_USER
+        value: youruser
+      - key: DB_PASS
+        value: yourpass
+      - key: API_KEY
+        value: MlQpO64ZF27xYuS5cs0YL4qbOfGubnlL
