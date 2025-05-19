@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
-const MISTRAL_API_KEY = "MlQpO64ZF27xYuS5cs0YL4qbOfGubnlL"; // ⚠️ Move this to a secure backend
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY; // ⚠️ Move this to a secure backend
 
 export const askMistral = async (messages) => {
   try {
