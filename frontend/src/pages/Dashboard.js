@@ -30,6 +30,7 @@ const Dashboard = () => {
     });
   };
 
+  const user = JSON.parse(localStorage.getItem("user"));
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f7f9fc', color: '#333' }}>
       <Sidebar />
@@ -37,7 +38,7 @@ const Dashboard = () => {
         <Navbar />
 
         <Typography variant="h4" sx={{ fontWeight: 600, mb: 3 }}>
-          Welcome back, Sanskar 👋
+          Welcome {user?.name || 'User'} 👋
         </Typography>
 
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>

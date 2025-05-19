@@ -31,11 +31,20 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    handleCloseMenu();
-    setConfirmOpen(false);
-    navigate('/login');
-  };
+  if (user?.email) {
+    localStorage.removeItem(`resumeDraft_${user.email}`);
+  }
+
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("resumeAiMessage");
+  localStorage.removeItem("recentResumeDownload");
+
+  handleCloseMenu();
+  setConfirmOpen(false);
+  navigate('/login');
+};
+
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#1e1e1e' }}>

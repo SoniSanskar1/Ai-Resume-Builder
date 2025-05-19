@@ -4,6 +4,15 @@ import { Box, Button, TextField, Typography, IconButton, Stack, Switch, FormCont
 import { Add, Delete } from '@mui/icons-material';
 import { createResume } from '../services/api';
 import { v4 as uuidv4 } from 'uuid';
+const getLoggedInUserEmail = () => {
+  return localStorage.getItem("loggedInEmail"); // or session/email from auth state
+};
+
+const getResumeKey = () => {
+  const email = getLoggedInUserEmail();
+  return email ? `resumeDraft_${email}` : null;
+};
+
 
 const CreateResume = () => {
   const [resume, setResume] = useState({
@@ -35,10 +44,14 @@ const CreateResume = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stored = localStorage.getItem("resumeDraft");
-    if (stored) {
-      setResume(JSON.parse(stored));
+    const key = getResumeKey();
+    if (key) {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        setResume(JSON.parse(stored));
+      }
     }
+
   }, []);
 
   const handleChange = (e) => {
@@ -93,7 +106,11 @@ const CreateResume = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    localStorage.setItem("resumeDraft", JSON.stringify(resume));
+    const key = getResumeKey();
+    if (key) {
+      localStorage.setItem(key, JSON.stringify(resume));
+    }
+
 
     try {
       const clonedResume = structuredClone(resume);

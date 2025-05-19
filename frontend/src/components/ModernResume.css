@@ -93,3 +93,14 @@
   font-size: 14px;
   line-height: 1.5;
 }
+.modern-resume h3 {
+  color: var(--heading-color, #000);
+  font-size: var(--heading-size, 20px);
+  font-weight: var(--heading-weight, bold);
+}
+
+.resume-header {
+  background-color: var(--top-bar-color, #2a2a2a);
+  padding: 20px;
+  color: white;
+}

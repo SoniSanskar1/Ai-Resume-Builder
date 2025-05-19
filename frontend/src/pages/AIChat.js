@@ -23,6 +23,33 @@ import ModernResume from "../components/ModernResume";
 
 const drawerWidth = 260;
 
+const getStyleAwareSystemInstruction = () => ({
+  role: "system",
+  content: `
+You are a resume-enhancing AI that also handles visual customization.
+
+Always respond with a valid JSON object representing the resume, including optional visual customizations under a "styleConfig" field.
+
+Supported "styleConfig" keys:
+- fontFamily
+- fontSize
+- headingColor
+- headingSize
+- headingWeight
+- backgroundColor
+- topBarColor
+- leftColumnColor
+
+Infer values from natural language instructions like:
+- "make top bar blue" → topBarColor: "#007BFF"
+- "use a modern font" → fontFamily: "Inter, sans-serif"
+- "dark mode" → backgroundColor: "#121212"
+- "make left column red" → leftColumnColor: "#FF0000"
+
+Do NOT explain anything. Do NOT return markdown. Only return the JSON object.
+`.trim()
+});
+
 const generateEnhancementPrompt = (data) => {
   const educationFormatted = data.educationList
     .map(e => `- ${e.degree} in ${e.field}, ${e.school} (${e.startDate} – ${e.endDate})`)
@@ -35,19 +62,28 @@ const generateEnhancementPrompt = (data) => {
       .join('\n');
 
   return `Enhance the following resume details to make it more professional, ATS-optimized, and structured.
-  
+
 Important:
-- DO NOT mentions the skills in summary part make it more proffesional about me section for resume
+- DO NOT mention skills in summary; make it a professional "About Me" section.
 - DO NOT modify or embellish personal details like name, title, email, phone, or address.
-- DO NOT generate skills or technologies inside the summary.
 - DO NOT fabricate experience. If isFresher is true, add only one experience entry with:
-  position: "Fresher"
-  company: ""
-  startDate: ""
-  endDate: ""
-  description: A general objective statement like: "Recent graduate seeking opportunities to apply academic knowledge in a real-world environment and grow as a software developer."
+  position: "Fresher", company: "", startDate: "", endDate: "", description: "Recent graduate seeking opportunities to apply academic knowledge in a real-world environment and grow as a {title}."
 - Keep summary focused, clean, and ATS-friendly.
 - Return ONLY a valid JSON object with the following fields:
+
+If the user’s prompt includes style or design preferences, also return a "styleConfig" object. This can include:
+- fontFamily (e.g., "Georgia", "Arial", "Times New Roman", "Inter")
+- fontSize (e.g., "16px", "14px")
+- headingColor (e.g., "#333", "#007BFF")
+- headingSize (e.g., "20px", "22px")
+- backgroundColor (e.g., "#fff", "#121212")
+- topBarColor (e.g., "#ccc", "#2a2a2a")
+
+Infer intelligent defaults from natural language prompts like:
+- “more formal” → fontFamily: "Georgia"
+- “modern” → fontFamily: "Inter"
+- “make it brighter” → backgroundColor: "#f9f9f9"
+- “top bar black” → topBarColor: "#000"
 
 {
   fullName: string,
@@ -60,7 +96,8 @@ Important:
   additionalSkills: array of strings,
   hobbies: array of strings,
   educationList: array of { degree, school, startDate, endDate },
-  experienceList: array of { position, company, startDate, endDate, description }
+  experienceList: array of { position, company, startDate, endDate, description },
+  styleConfig: optional object
 }
 
 User Resume:
@@ -113,6 +150,7 @@ const AiChatWithSidebar = () => {
         setChats(updatedChats);
 
         setLoading(true);
+
         const aiResponse = await askMistral([{ role: "user", content: formattedPrompt }]);
         setLoading(false);
         const aiText = aiResponse.content;
@@ -160,11 +198,22 @@ const AiChatWithSidebar = () => {
     setInput("");
     setLoading(true);
 
-    const aiResponse = await askMistral([{ role: "user", content: input }]);
+    const currentChat = updatedChats.find((c) => c.id === currentChatId);
+    const messageHistory = currentChat.messages.map((msg) => ({
+      role: msg.sender === "user" ? "user" : "assistant",
+      content: msg.text,
+    }));
+
+    const aiResponse = await askMistral([
+      getStyleAwareSystemInstruction(),
+      ...messageHistory,
+      { role: "user", content: input }
+    ]);
+
     setLoading(false);
     const aiText = aiResponse.content;
-
     const aiMsg = { sender: "ai", text: aiText };
+
     const finalChats = updatedChats.map((chat) =>
       chat.id === currentChatId
         ? { ...chat, messages: [...chat.messages, aiMsg] }
@@ -217,7 +266,50 @@ const AiChatWithSidebar = () => {
       })
     );
   };
+  const generateFromLastAiResponse = () => {
+    const currentChat = chats.find((c) => c.id === currentChatId);
+    if (!currentChat) return;
 
+    const lastAiMessage = [...currentChat.messages].reverse().find(m => m.sender === "ai");
+    if (!lastAiMessage) {
+      alert("No AI response found to generate resume.");
+      return;
+    }
+
+    let rawText = lastAiMessage.text.trim();
+
+    // Handle markdown code block
+    const codeBlockMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      rawText = codeBlockMatch[1].trim();
+    }
+
+    // Try extracting a JSON block from anywhere in text
+    const tryParseJsonFromString = (text) => {
+      const jsonStart = text.indexOf("{");
+      const jsonEnd = text.lastIndexOf("}");
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        const potentialJson = text.substring(jsonStart, jsonEnd + 1);
+        try {
+          return JSON.parse(potentialJson);
+        } catch (e) {
+          console.error("Failed JSON parse:", e);
+          return null;
+        }
+      }
+      return null;
+    };
+
+    const parsed = tryParseJsonFromString(rawText);
+
+    if (!parsed) {
+      alert("Last AI response could not be parsed as a valid resume JSON.");
+      setResumeText(null);
+      return;
+    }
+
+    setResumeText(parsed);
+  };
 
   return (
     <Box sx={{ display: "flex", bgcolor: "#121212", height: "100vh", color: "#fff" }}>
@@ -334,6 +426,9 @@ const AiChatWithSidebar = () => {
           />
           <Button variant="contained" onClick={handleSendMessage}>
             Send
+          </Button>
+          <Button variant="outlined" onClick={generateFromLastAiResponse}>
+            Generate Resume
           </Button>
         </Box>
       </Box>

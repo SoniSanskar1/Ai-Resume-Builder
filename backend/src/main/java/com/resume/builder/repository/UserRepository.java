@@ -1,7 +1,7 @@
 package com.resume.builder.repository;
 
 import com.resume.builder.model.User;
-import com.resume.builder.model.Resume;
+// import com.resume.builder.model.Resume;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
