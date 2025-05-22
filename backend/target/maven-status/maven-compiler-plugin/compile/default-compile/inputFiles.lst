@@ -13,6 +13,7 @@ D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\model\Cust
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\model\Education.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\service\UserService.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\util\JwtUtil.java
+D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\config\DotenvInitializer.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\model\Resume.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\controller\UserController.java
 D:\project\ai-resume-builder\backend\src\main\java\com\resume\builder\config\WebConfig.java

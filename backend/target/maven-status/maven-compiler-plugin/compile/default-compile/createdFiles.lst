@@ -18,6 +18,7 @@ com\resume\builder\service\impl\ResumeServiceImpl.class
 com\resume\builder\controller\ResumeController.class
 com\resume\builder\repository\ResumeRepository.class
 com\resume\builder\config\SecurityConfig.class
+com\resume\builder\config\DotenvInitializer.class
 com\resume\builder\repository\EducationRepository.class
 com\resume\builder\repository\ExperienceRepository.class
 com\resume\builder\dto\NotBlank.class
