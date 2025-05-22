@@ -1,9 +1,9 @@
 services:
   - type: web
     name: resume-backend
-    plan: free
+    runtime: docker
     rootDir: backend
-    dockerfilePath: ./Dockerfile
+    plan: free
     envVars:
       - key: DB_URL
         value: jdbc:postgresql://localhost:5432/resume_builder
