@@ -4,8 +4,6 @@ services:
     plan: free
     rootDir: backend
     dockerfilePath: ./Dockerfile
-    buildCommand: mvn clean install
-    startCommand: java -jar target/*.jar
     envVars:
       - key: DB_URL
         value: jdbc:postgresql://localhost:5432/resume_builder
