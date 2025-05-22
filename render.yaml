@@ -1,7 +1,6 @@
 services:
   - type: web
     name: resume-backend
-    runtime: java
     plan: free
     rootDir: backend
     buildCommand: mvn clean install
