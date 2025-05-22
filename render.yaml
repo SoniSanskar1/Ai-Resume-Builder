@@ -1,10 +1,10 @@
 services:
   - type: web
     name: resume-backend
-    # runtime: java
+    runtime: java
     plan: free
     rootDir: backend
-    buildCommand: ./mvnw clean install
+    buildCommand: mvn clean install
     startCommand: java -jar target/*.jar
     envVars:
       - key: DB_URL
