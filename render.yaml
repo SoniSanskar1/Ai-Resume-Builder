@@ -3,6 +3,7 @@ services:
     name: resume-backend
     plan: free
     rootDir: backend
+    dockerfilePath: ./Dockerfile
     buildCommand: mvn clean install
     startCommand: java -jar target/*.jar
     envVars:
