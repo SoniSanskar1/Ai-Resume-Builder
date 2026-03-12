@@ -1,14 +1,15 @@
 import axios from 'axios';
 
-const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
-const MISTRAL_API_KEY = "keyIsSavedInNotes"; // Frontend me mat rakhna long-term ke liye
+const MISTRAL_API_URL = process.env.REACT_APP_MISTRAL_API_URL || "https://api.mistral.ai/v1/chat/completions";
+const MISTRAL_API_KEY = process.env.REACT_APP_MISTRAL_API_KEY || "keyIsSavedInNotes";
+const MISTRAL_MODEL = process.env.REACT_APP_MISTRAL_MODEL || "mistral-small";
 
 export const askMistral = async (messages) => {
   try {
     const response = await axios.post(
       MISTRAL_API_URL,
       {
-        model: "mistral-small",
+        model: MISTRAL_MODEL,
         messages: messages,
       },
       {
